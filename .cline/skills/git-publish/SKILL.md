@@ -1,8 +1,7 @@
 ---
 name: git-publish
-description: >-
-  Публикация изменений в VCS добавляет новые файлы в Git, проверяет критические
-  ошибки сборкой Gradle, коммитит с сообщением и пушит в удалённый репозиторий.
+description: "Публикация изменений в VCS добавляет новые файлы в Git, проверяет критические
+  ошибки сборкой Gradle, коммитит с сообщением и пушит в удалённый репозиторий."
 user-invocable: true
 ---
 
@@ -22,7 +21,7 @@ user-invocable: true
 Скрипт сам находит корень репозитория (работает из любой директории):
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .clinerules/skills/git-publish/scripts/publish.ps1 -Message "feat: ..."
+powershell -NoProfile -ExecutionPolicy Bypass -File .cline/skills/git-publish/scripts/publish.ps1 -Message "feat: ..."
 ```
 
 ### Параметры
@@ -39,13 +38,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .clinerules/skills/git-publi
 
 ```powershell
 # Полный цикл: добавить файлы -> проверка сборки -> коммит -> пуш
-.\.clinerules\skills\git-publish\scripts\publish.ps1 -Message "feat: логика игры змейка"
+.\.cline\skills\git-publish\scripts\publish.ps1 -Message "feat: логика игры змейка"
 
 # С прогонкой юнит-тестов
-.\.clinerules\skills\git-publish\scripts\publish.ps1 -Message "fix: детекция столкновений" -WithTests
+.\.cline\skills\git-publish\scripts\publish.ps1 -Message "fix: детекция столкновений" -WithTests
 
 # Коммит без пуша
-.\.clinerules\skills\git-publish\scripts\publish.ps1 -Message "wip: стадия 1" -NoPush
+.\.cline\skills\git-publish\scripts\publish.ps1 -Message "wip: стадия 1" -NoPush
 ```
 
 ## Правила сообщения коммита
