@@ -9,20 +9,20 @@ working, runnable application state (except Stage 0) and passing tests.
 **Goal:** project builds successfully, dependencies scaffold and folder structure in place.
 
 ### 0.1. Version Catalog and Dependencies
-- [ ] Add to `gradle/libs.versions.toml`: `compose-bom`, `material3`,
+- [x] Add to `gradle/libs.versions.toml`: `compose-bom`, `material3`,
       `activity-compose`, `androidx.test.ext:junit` (for UI tests later),
       `junit5` libraries for core unit tests.
-- [ ] In `app/build.gradle.kts`: `testImplementation` — JUnit 5 (+ junit-vintage
+- [x] In `app/build.gradle.kts`: `testImplementation` — JUnit 5 (+ junit-vintage
       or migration to JUnit 4, depending on choice), `debugImplementation` — Compose UI Test.
 
 ### 0.2. Module Configuration
-- [ ] `android { namespace = "com.example.gametestapp" }` (matches
-      `applicationId`), `minSdk 24`, `compileSdk 36`, `targetSdk 36`.
+- [x] `android { namespace = "com.neway.gametestapp" }` (matches
+      `applicationId`), `minSdk 24`, `compileSdk 37`, `targetSdk 37`.
 
 ### 0.3. Package Structure
-- [ ] Create directory tree and placeholder classes:
+- [x] Create directory tree and placeholder classes:
   ```
-  com.example.gametestapp
+  com.neway.gametestapp
   ├── MainActivity.kt
   ├── ui
   │   ├── theme/          (Theme.kt, Color.kt, Type.kt)

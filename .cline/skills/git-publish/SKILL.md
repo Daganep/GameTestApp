@@ -1,6 +1,9 @@
 ---
 name: git-publish
-description: Публикация изменений в VCS добавляет новые файлы в Git, проверяет критические ошибки сборкой Gradle, коммитит с сообщением и пушит в удалённый репозиторий. Использовать при запросах «коммить и пуш», «опубликуй изменения», «выпусти стадию».
+description: >-
+  Публикация изменений в VCS добавляет новые файлы в Git, проверяет критические
+  ошибки сборкой Gradle, коммитит с сообщением и пушит в удалённый репозиторий.
+user-invocable: true
 ---
 
 # Git Publish — добавить файлы, проверить, коммит, пуш
@@ -19,7 +22,7 @@ description: Публикация изменений в VCS добавляет �
 Скрипт сам находит корень репозитория (работает из любой директории):
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File skills/git-publish/scripts/publish.ps1 -Message "feat: ..."
+powershell -NoProfile -ExecutionPolicy Bypass -File .clinerules/skills/git-publish/scripts/publish.ps1 -Message "feat: ..."
 ```
 
 ### Параметры
@@ -36,13 +39,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File skills/git-publish/scripts/p
 
 ```powershell
 # Полный цикл: добавить файлы -> проверка сборки -> коммит -> пуш
-.\skills\git-publish\scripts\publish.ps1 -Message "feat: логика игры змейка"
+.\.clinerules\skills\git-publish\scripts\publish.ps1 -Message "feat: логика игры змейка"
 
 # С прогонкой юнит-тестов
-.\skills\git-publish\scripts\publish.ps1 -Message "fix: детекция столкновений" -WithTests
+.\.clinerules\skills\git-publish\scripts\publish.ps1 -Message "fix: детекция столкновений" -WithTests
 
 # Коммит без пуша
-.\skills\git-publish\scripts\publish.ps1 -Message "wip: стадия 1" -NoPush
+.\.clinerules\skills\git-publish\scripts\publish.ps1 -Message "wip: стадия 1" -NoPush
 ```
 
 ## Правила сообщения коммита
