@@ -1,27 +1,26 @@
-# Этапы разработки игры «Змейка»
+# Snake Game Development Plan
 
-Документ описывает последовательность работ. Каждый этап завершается
-рабочим, запускаемым состоянием приложения (кроме 0-го) и пройденными
-тестами.
+This document describes the sequence of work. Each stage ends with a
+working, runnable application state (except Stage 0) and passing tests.
 
 ---
 
-## Этап 0. Подготовка проекта
-**Цель:** проект собирается, есть каркас зависимостей и структура папок.
+## Stage 0. Project Setup
+**Goal:** project builds successfully, dependencies scaffold and folder structure in place.
 
-### 0.1. Каталог версий и зависимости
-- [ ] В `gradle/libs.versions.toml` добавить: `compose-bom`, `material3`,
-      `activity-compose`, `androidx.test.ext:junit` (для UI-тестов позже),
-      `junit5`-библиотеки для юнит-тестов ядра.
-- [ ] В `app/build.gradle.kts`: `testImplementation` — JUnit 5 (+junit-vintage
-      или миграция на JUnit 4, в зависимости от выбора), `debugImplementation` — Compose UI Test.
+### 0.1. Version Catalog and Dependencies
+- [ ] Add to `gradle/libs.versions.toml`: `compose-bom`, `material3`,
+      `activity-compose`, `androidx.test.ext:junit` (for UI tests later),
+      `junit5` libraries for core unit tests.
+- [ ] In `app/build.gradle.kts`: `testImplementation` — JUnit 5 (+ junit-vintage
+      or migration to JUnit 4, depending on choice), `debugImplementation` — Compose UI Test.
 
-### 0.2. Конфигурация модуля
-- [ ] `android { namespace = "com.example.gametestapp" }` (совпадает с
+### 0.2. Module Configuration
+- [ ] `android { namespace = "com.example.gametestapp" }` (matches
       `applicationId`), `minSdk 24`, `compileSdk 36`, `targetSdk 36`.
 
-### 0.3. Структура пакетов
-- [ ] Создать дерево каталогов и placeholder-классы:
+### 0.3. Package Structure
+- [ ] Create directory tree and placeholder classes:
   ```
   com.example.gametestapp
   ├── MainActivity.kt
@@ -38,239 +37,238 @@
   └── util/               (SwipeDetector, GameTimer)
   ```
 
-**Критерий завершения:** `./gradlew :app:assembleDebug` — BUILD SUCCESSFUL,
-пустой Activity запускается на устройстве/эмуляторе.
+**Done when:** `./gradlew :app:assembleDebug` — BUILD SUCCESSFUL,
+empty Activity launches on device/emulator.
 
 ---
 
-## Этап 1. Игровое ядро (чистый Kotlin)
-**Цель:** вся логика игры без Android, 100% покрыта юнит-тестами.
+## Stage 1. Game Core (Pure Kotlin)
+**Goal:** all game logic without Android, 100% unit test coverage.
 
-### 1.1. Модели данных
-- [ ] `Direction` (enum: UP, DOWN, LEFT, RIGHT + метод `opposite()`).
-- [ ] `Point(x, y)` — data class для координат клетки.
+### 1.1. Data Models
+- [ ] `Direction` (enum: UP, DOWN, LEFT, RIGHT + `opposite()` method).
+- [ ] `Point(x, y)` — data class for cell coordinates.
 - [ ] `GameConfig` (size=15, startIntervalMs=150, minIntervalMs=60,
       speedUpEvery=5, intervalStepMs=10).
 
-### 1.2. Игровая машина состояний (`SnakeGame`)
-- [ ] Поля: `state: State` (PLAYING / PAUSED / GAME_OVER),
-      `snake: List<Point>` (хвост = голова), `food: Point`, `score: Int`,
+### 1.2. Game State Machine (`SnakeGame`)
+- [ ] Fields: `state: State` (PLAYING / PAUSED / GAME_OVER),
+      `snake: List<Point>` (tail = head), `food: Point`, `score: Int`,
       `direction`, `pendingDirection`, `tickIntervalMs`.
-- [ ] `fun step()` — один тик: применить направление, проверить коллизии
-      (стена / тело), съесть еду (+10, рост, новый спавн, ускорение каждые 5).
-- [ ] `fun changeDirection(newDir)` — отклонить разворот на 180° и направление
-      «в никуда».
-- [ ] `fun reset()` — начальное состояние (3 сегмента в центре, движение вправо).
+- [ ] `fun step()` — one tick: apply direction, check collisions
+      (wall / body), eat food (+10, growth, new spawn, speed-up every 5).
+- [ ] `fun changeDirection(newDir)` — reject 180° turns and "no-direction" input.
+- [ ] `fun reset()` — initial state (3 segments in center, moving right).
 - [ ] `fun pause() / resume()`.
 
-### 1.3. Генерация еды
-- [ ] `FoodSpawner.randomFreeCell(snake, size, random)` — только свободные
-      клетки; если клеток не осталось — победа (игра окончена со special flag).
+### 1.3. Food Generation
+- [ ] `FoodSpawner.randomFreeCell(snake, size, random)` — only free cells;
+      if no cells remain — win (game over with special flag).
 
-### 1.4. Юнит-тесты (`app/src/test/.../game/`)
-- [ ] Движение по каждому направлению, wrap НЕ происходит (стена = смерть).
-- [ ] Разворот на 180° игнорируется.
-- [ ] Съедание еды: рост, +10, новый спавн, еда не на змейке.
-- [ ] Ускорение каждые 5 единиц еды, не ниже 60 мс.
-- [ ] Коллизия с телом и стеной → GAME_OVER.
-- [ ] `reset` полностью сбрасывает состояние.
+### 1.4. Unit Tests (`app/src/test/.../game/`)
+- [ ] Movement in each direction, no wrap (wall = death).
+- [ ] 180° turn is ignored.
+- [ ] Eating food: growth, +10, new spawn, food not on snake.
+- [ ] Speed-up every 5 food units, not below 60 ms.
+- [ ] Collision with body and wall → GAME_OVER.
+- [ ] `reset` fully resets state.
 
-**Критерий завершения:** `./gradlew :app:testDebugUnitTest` — все тесты
-зелёные, покрытие логических классов — 100% ветвлений.
+**Done when:** `./gradlew :app:testDebugUnitTest` — all tests
+green, logical classes 100% branch coverage.
 
 ---
 
-## Этап 2. Хранение рекорда
-**Цель:** рекорд переживает перезапуск приложения.
+## Stage 2. High Score Storage
+**Goal:** high score survives app restarts.
 
-### 2.1. Интерфейс ScoreStorage
-- [ ] Определить интерфейс
+### 2.1. ScoreStorage Interface
+- [ ] Define interface
       `ScoreStorage { fun getBest(): Int; fun updateBest(score: Int) }`.
-**Критерий завершения:** интерфейс скомпилирован, доступен из других
-пакетов модуля.
+**Done when:** interface compiled, accessible from other
+packages in the module.
 
-### 2.2. Реализация PrefsScoreStorage
-- [ ] Реализовать `PrefsScoreStorage(context)` на `SharedPreferences`
-      (файл `snake_prefs`, ключ `best_score`).
-- [ ] Обработать отсутствие ключа (возвращать 0 по умолчанию).
-**Критерий завершения:** `getBest()` / `updateBest()` работают корректно
-при ручном smoke-проверке (или через инструментированный тест).
+### 2.2. PrefsScoreStorage Implementation
+- [ ] Implement `PrefsScoreStorage(context)` on `SharedPreferences`
+      (file `snake_prefs`, key `best_score`).
+- [ ] Handle missing key (return 0 by default).
+**Done when:** `getBest()` / `updateBest()` work correctly
+on manual smoke check (or via instrumentation test).
 
-### 2.3. Юнит-тесты
-- [ ] Тест: начальное значение — 0.
-- [ ] Тест: обновление при большем счёте.
-- [ ] Тест: отсутствие изменения при меньшем счёте.
-**Критерий завершения:** юнит-тесты проходят (с `Robolectric` или моканием
+### 2.3. Unit Tests
+- [ ] Test: initial value is 0.
+- [ ] Test: update on higher score.
+- [ ] Test: no change on lower score.
+**Done when:** unit tests pass (with `Robolectric` or mocked
 Context).
 
 ---
 
-## Этап 3. Тема и главный экран
-**Цель:** видимое приложение с меню.
+## Stage 3. Theme and Main Screen
+**Goal:** visible app with a menu.
 
-### 3.1. Тема оформления
-- [ ] `ui/theme/`: Material 3, светлая + тёмная палитра
-      (зелёная акцентная тема под «змею»), `Type.kt` по умолчанию.
+### 3.1. Theme
+- [ ] `ui/theme/`: Material 3, light + dark palettes
+      (green accent theme for the "snake"), `Type.kt` default.
 
-### 3.2. Навигация
-- [ ] `MainActivity`: `setContent { ... }`, навигация через
+### 3.2. Navigation
+- [ ] `MainActivity`: `setContent { ... }`, navigation via
       `sealed class Screen { Menu, Game, HowTo, GameOver(val score: Int, val isNewRecord: Boolean) }`
-      + `remember { mutableStateOf(Screen.Menu) }` (без Jetpack Navigation
-      — экранов всего 4).
+      + `remember { mutableStateOf(Screen.Menu) }` (no Jetpack Navigation
+      — only 4 screens).
 
-### 3.3. Главный экран
-- [ ] `MainMenuScreen`: заголовок «Змейка», рекорд, кнопки «Играть»
-      (Fill, primary), «Как играть» (Tonal), версия/подпись.
+### 3.3. Main Screen
+- [ ] `MainMenuScreen`: title "Snake", high score, "Play" button
+      (Fill, primary), "How to Play" (Tonal), version/copyright.
 
-### 3.4. Экран «Как играть»
-- [ ] `HowToScreen`: правила (свайп/стрелки, еда, столкновения, скорость),
-      кнопка «Назад».
+### 3.4. "How to Play" Screen
+- [ ] `HowToScreen`: rules (swipe/arrows, food, collisions, speed),
+      "Back" button.
 
-**Критерий завершения:** приложение запускается, экраны переключаются,
-тёмная тема работает.
+**Done when:** app launches, screens switch,
+dark theme works.
 
 ---
 
-## Этап 4. Игровой движок (SnakeGame.kt)
-**Цель:** вся игровая логика работает без Android и покрывается тестами.
+## Stage 4. Game Engine (SnakeGame.kt)
+**Goal:** all game logic works without Android and is covered by tests.
 
-### 4.1. Модели данных
+### 4.1. Data Models
 - [ ] `core/model/Point.kt` — data class `Point(val x: Int, val y: Int)`.
 - [ ] `core/model/Direction.kt` — enum `UP/DOWN/LEFT/RIGHT`,
-      свойства `dx/dy`, метод `opposite()`.
-**Критерий завершения:** классы скомпилированы, доступны из других пакетов.
+      `dx/dy` properties, `opposite()` method.
+**Done when:** classes compiled, available from other packages.
 
-### 4.2. Класс SnakeGame (состояние и инициализация)
-- [ ] `SnakeGame`: сетка (напр. 15×21), `snake: List<Point>`, `direction`,
+### 4.2. SnakeGame Class (state and initialization)
+- [ ] `SnakeGame`: grid (e.g. 15×21), `snake: List<Point>`, `direction`,
       `food: Point`, `score`, `isGameOver`, `speedMs`.
-- [ ] Начальное состояние: змея из 3 сегментов в центре, направление RIGHT,
-      еда — случайная свободная клетка.
-**Критерий завершения:** объект `SnakeGame` создаётся, все поля
-инициализированы, `isGameOver == false`.
+- [ ] Initial state: 3-segment snake in the center, direction RIGHT,
+      food — random free cell.
+**Done when:** `SnakeGame` object created, all fields
+initialized, `isGameOver == false`.
 
-### 4.3. Метод step()
-- [ ] Сдвиг головы в направлении `direction`.
-- [ ] Рост хвоста при съедании еды (`score += 10`).
-- [ ] Проверка столкновений: стена и собственное тело → `isGameOver = true`.
-- [ ] Генерация `randomFood()` вне змеи (seed'ed `Random` для
-      воспроизводимости).
-- [ ] Ускорение: `speedMs −5 мс` на каждую еду (мин. 90 мс).
-**Критерий завершения:** один вызов `step()` корректно обновляет
-положение змеи, счёт, скорость и состояние игры.
+### 4.3. step() Method
+- [ ] Move head in `direction`.
+- [ ] Tail growth when food is eaten (`score += 10`).
+- [ ] Collision check: wall and own body → `isGameOver = true`.
+- [ ] `randomFood()` generation off the snake (seeded `Random` for
+      reproducibility).
+- [ ] Speed up: `speedMs −5 ms` per food (min. 90 ms).
+**Done when:** one `step()` call correctly updates
+snake position, score, speed and game state.
 
-### 4.4. Метод changeDirection()
-- [ ] Принять новое направление из UI.
-- [ ] Игнорировать разворот на 180° (напр. UP → DOWN).
-- [ ] Игнорировать более одного поворота за один тик (напр. UP → LEFT →
-      DOWN в одном тике — применить только первый).
-**Критерий завершения:** развороты обрабатываются согласно правилам,
-змейка не может повернуть на себя за один тик.
+### 4.4. changeDirection() Method
+- [ ] Accept new direction from UI.
+- [ ] Ignore 180° reversal (e.g. UP → DOWN).
+- [ ] Ignore more than one turn per tick (e.g. UP → LEFT →
+      DOWN in one tick — apply only the first one).
+**Done when:** reversals handled per the rules,
+snake cannot turn onto itself in one tick.
 
-### 4.5. Юнит-тесты
-- [ ] Тесты на рост: съедание еды увеличивает длину на 1.
-- [ ] Тесты на стену: движение за границу → `isGameOver == true`.
-- [ ] Тесты на хвост: столкновение с телом → `isGameOver == true`.
-- [ ] Тесты на разворот: 180° игнорируется.
-- [ ] Тесты на ускорение: `speedMs` уменьшается на 5 мс, не ниже 90.
-- [ ] Тесты на счёт: `score` корректно инкрементируется.
-- [ ] Тесты на спавн еды: еда не появляется на змейке
-      (seed'ed `Random`, ≥ 100 итераций).
-**Критерий завершения:** ≥ 15 тестов, покрытие ключевых ветвей 100 %,
-`./gradlew :app:testDebugUnitTest` зелёное.
+### 4.5. Unit Tests
+- [ ] Growth tests: eating food increases length by 1.
+- [ ] Wall tests: moving out of bounds → `isGameOver == true`.
+- [ ] Tail tests: collision with body → `isGameOver == true`.
+- [ ] Reversal tests: 180° is ignored.
+- [ ] Speed-up tests: `speedMs` decreases by 5 ms, not below 90.
+- [ ] Score tests: `score` increments correctly.
+- [ ] Food spawn tests: food never spawns on the snake
+      (seeded `Random`, ≥ 100 iterations).
+**Done when:** ≥ 15 tests, 100% coverage of key branches,
+`./gradlew :app:testDebugUnitTest` green.
 
 ---
 
-## Этап 5. Игровой экран
-**Цель:** играется «как змейка».
+## Stage 5. Game Screen
+**Goal:** playable "like a snake".
 
 ### 5.1. GameViewModel
-- [ ] `GameViewModel : AndroidViewModel` + `SnakeGame` из модуля `core`;
+- [ ] `GameViewModel : AndroidViewModel` + `SnakeGame` from the `core` module;
       `MutableStateFlow<GameUiState>`.
 
-### 5.2. Игровой цикл (Ticker)
-- [ ] `Handler(Looper.getMainLooper())` + `postDelayed` с
-      динамическим интервалом из `speedMs`; старт/пауза/остановка;
-      `onCleared()` — гарантированное удаление задержанного сообщения.
+### 5.2. Game loop (Ticker)
+- [ ] `Handler(Looper.getMainLooper())` + `postDelayed` with a dynamic
+      interval from `speedMs`; start/pause/stop;
+      `onCleared()` — guaranteed removal of the delayed message.
 
-### 5.3. Рендер и ввод (`GameScreen`)
-- [ ] Canvas/Compose-рендер: змея (rounded-rect сегменты, голова),
-      еда (круг/«яблоко»), сетка фона; `BoxWithConstraints` для размера.
-- [ ] Жесты: `detectVerticalSwipeGestures` + `detectHorizontalSwipeGestures`
+### 5.3. Rendering and input (`GameScreen`)
+- [ ] Canvas/Compose rendering: snake (rounded-rect segments, head),
+      food (circle/"apple"), background grid; `BoxWithConstraints` for sizing.
+- [ ] Gestures: `detectVerticalSwipeGestures` + `detectHorizontalSwipeGestures`
       → `changeDirection`.
-- [ ] `onKeyDown`-эмуляция для клавиатурного ввода (опционально).
-- [ ] Кнопка «Пауза», счёт и рекорд сверху.
+- [ ] `onKeyDown` emulation for keyboard input (optional).
+- [ ] "Pause" button, score and high score at the top.
 
-### 5.4. Переход в «Игра окончена»
-- [ ] Переход в `Screen.GameOver(score, isNewRecord)` при `isGameOver`.
-- [ ] Запись рекорда через `ScoreStorage`.
+### 5.4. Transition to "Game Over"
+- [ ] Transition to `Screen.GameOver(score, isNewRecord)` on `isGameOver`.
+- [ ] High score persistence via `ScoreStorage`.
 
-**Критерий завершения:** полная игровая сессия на устройстве/эмуляторе;
-пауза; рекорд обновляется; без утечек (LeakCanary-проверка намеренно —
-через лог памяти при 10 сессиях).
-
----
-
-## Этап 6. Экран «Игра окончена», полировка, релиз-сборка
-**Цель:** финальный экран, полировка и готовая к установке сборка.
-
-### 6.1. Экран «Игра окончена»
-- [ ] `GameOverScreen`: счёт, «Новый рекорд!» (условно), кнопки
-      «Ещё раз» / «В меню»; анимация появления.
-
-### 6.2. Полировка UI и ресурсов
-- [ ] Звуковые эффекты (опц.).
-- [ ] Вибрация при смерти.
-- [ ] Splash-экран (Compose `SplashScreen`).
-- [ ] Иконка приложения (adaptive icon).
-- [ ] `strings.xml` — весь текст вынесен в ресурсы.
-
-### 6.3. Качество, сборка и релиз
-- [ ] `lint` без ошибок, `testDebugUnitTest` зелёное.
-- [ ] `assembleRelease` + подпись debug-ключом для проверки в Play
-      Internal (опц.).
-- [ ] README.md: как собрать и запустить.
-
-**Критерий завершения:** приложение готово к установке на реальное
-устройство; список «что дальше» (дополнения: уровни, бонусы, мультиплеер).
+**Done when:** a full game session on device/emulator;
+pause works; high score is updated; no leaks (LeakCanary check is optional —
+via a memory log over 10 sessions).
 
 ---
 
-## Порядок и зависимости
+## Stage 6. "Game Over" screen, polish, release build
+**Goal:** final screen, polish, and an installable build.
+
+### 6.1. "Game Over" screen
+- [ ] `GameOverScreen`: score, "New Record!" (conditional), "Play Again" /
+      "Menu" buttons; appear animation.
+
+### 6.2. UI and resources polish
+- [ ] Sound effects (optional).
+- [ ] Haptic feedback on death.
+- [ ] Splash screen (Compose `SplashScreen`).
+- [ ] App icon (adaptive icon).
+- [ ] `strings.xml` — all text moved to resources.
+
+### 6.3. Quality, build and release
+- [ ] `lint` without errors, `testDebugUnitTest` green.
+- [ ] `assembleRelease` + signing with a debug key for Play
+      Internal verification (optional).
+- [ ] README.md: how to build and run.
+
+**Done when:** the app is ready to be installed on a real
+device; a "what's next" list (additions: levels, bonuses, multiplayer).
+
+---
+
+## Order and dependencies
 
 ```
-Этап 0 ──► Этап 1 ──► Этап 2 ──► Этап 4 ──► Этап 5 ──► Этап 6
-             └────────► Этап 3 ────────┘
+Stage 0 ──► Stage 1 ──► Stage 2 ──► Stage 4 ──► Stage 5 ──► Stage 6
+             └────────► Stage 3 ────────┘
 ```
-Этапы 2 и 3 можно делать параллельно; Этап 4 не зависит от UI.
+Stages 2 and 3 can be done in parallel; Stage 4 does not depend on the UI.
 
-## Оптимистичные сроки (1 разработчик, ~4 ч/день)
+## Optimistic timeline (1 developer, ~4 h/day)
 
-| Этап | Оценка |
-|------|--------|
-| 0    | 0.5 д  |
-| 1    | 0.5 д  |
-| 2    | 0.5 д  |
-| 3    | 1 д    |
-| 4    | 1 д    |
-| 5    | 1–1.5 д |
-| 6    | 0.5–1 д |
-| **Итого** | **5–6 дней** |
+| Stage | Estimate |
+|-------|----------|
+| 0     | 0.5 d    |
+| 1     | 0.5 d    |
+| 2     | 0.5 d    |
+| 3     | 1 d      |
+| 4     | 1 d      |
+| 5     | 1–1.5 d  |
+| 6     | 0.5–1 d  |
+| **Total** | **5–6 days** |
 
-## Риски
+## Risks
 
-| Риск | Митигация |
+| Risk | Mitigation |
 |------|-----------|
-| Утечка памяти в тикере | `removeCallbacks` в `onCleared` + `onPause` |
-| Двойной тик после resume | флаг `isRunning` + перезапуск тикера только из `onResume` |
-| Разворот на себя в пределах одного тика | буферировать максимум 2 направления в очереди |
-| Случайная еда «залипает» на змее | `randomFood()` с циклом/множеством свободных клеток |
+| Memory leak in the ticker | `removeCallbacks` in `onCleared` + `onPause` |
+| Double tick after resume | `isRunning` flag + restart the ticker only from `onResume` |
+| Reversal onto itself within a single tick | buffer up to 2 directions in a queue |
+| Random food "sticks" to the snake | `randomFood()` using a loop/set of free cells |
 
-## Критерии приёмки (Definition of Done)
+## Acceptance criteria (Definition of Done)
 
-- [ ] Игра полностью playable на Android 7.0+ (API 24+).
-- [ ] Рекорд сохраняется между запусками.
-- [ ] ≥ 15 юнит-тестов на движок, все зелёные.
-- [ ] Линтер без ошибок; предупреждения — не более 10.
-- [ ] Тёмная тема, свайпы, пауза работают.
-- [ ] README с инструкцией сборки.
+- [ ] The game is fully playable on Android 7.0+ (API 24+).
+- [ ] High score is saved across launches.
+- [ ] ≥ 15 unit tests for the engine, all green.
+- [ ] Linter without errors; warnings — no more than 10.
+- [ ] Dark theme, swipes, and pause work.
+- [ ] README with build instructions.
 
