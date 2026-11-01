@@ -107,21 +107,21 @@ Context).
 **Goal:** visible app with a menu.
 
 ### 3.1. Theme
-- [ ] `ui/theme/`: Material 3, light + dark palettes
+- [x] `ui/theme/`: Material 3, light + dark palettes
       (green accent theme for the "snake"), `Type.kt` default.
 
 ### 3.2. Navigation
-- [ ] `MainActivity`: `setContent { ... }`, navigation via
+- [x] `MainActivity`: `setContent { ... }`, navigation via
       `sealed class Screen { Menu, Game, HowTo, GameOver(val score: Int, val isNewRecord: Boolean) }`
       + `remember { mutableStateOf(Screen.Menu) }` (no Jetpack Navigation
       — only 4 screens).
 
 ### 3.3. Main Screen
-- [ ] `MainMenuScreen`: title "Snake", high score, "Play" button
+- [x] `MainMenuScreen`: title "Snake", high score, "Play" button
       (Fill, primary), "How to Play" (Tonal), version/copyright.
 
 ### 3.4. "How to Play" Screen
-- [ ] `HowToScreen`: rules (swipe/arrows, food, collisions, speed),
+- [x] `HowToScreen`: rules (swipe/arrows, food, collisions, speed),
       "Back" button.
 
 **Done when:** app launches, screens switch,

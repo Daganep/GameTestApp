@@ -4,14 +4,29 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.neway.gametestapp.game.storage.PrefsScoreStorage
+import com.neway.gametestapp.ui.game.GameScreen
+import com.neway.gametestapp.ui.gameover.GameOverScreen
+import com.neway.gametestapp.ui.howto.HowToScreen
+import com.neway.gametestapp.ui.menu.MainMenuScreen
 import com.neway.gametestapp.ui.theme.GameTestAppTheme
+
+/**
+ * Single screen state for the whole app (Stage 3.2).
+ * Navigation is state-based — no Jetpack Navigation (only 4 screens).
+ */
+sealed class Screen {
+    object Menu : Screen()
+    object Game : Screen()
+    object HowTo : Screen()
+    data class GameOver(val score: Int, val isNewRecord: Boolean) : Screen()
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +34,31 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GameTestAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AppRoot()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+private fun AppRoot() {
+    val context = LocalContext.current
+    var screen by remember { mutableStateOf<Screen>(Screen.Menu) }
+    val scoreStorage = remember { PrefsScoreStorage(context) }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    GameTestAppTheme {
-        Greeting("Android")
+    when (screen) {
+        Screen.Menu -> MainMenuScreen(
+            bestScore = scoreStorage.getBest(),
+            onPlay = { screen = Screen.Game },
+            onHowTo = { screen = Screen.HowTo }
+        )
+
+        Screen.Game -> GameScreen()
+
+        Screen.HowTo -> HowToScreen(
+            onBack = { screen = Screen.Menu }
+        )
+
+        is Screen.GameOver -> GameOverScreen()
     }
 }
