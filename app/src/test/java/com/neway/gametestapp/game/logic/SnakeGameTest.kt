@@ -107,20 +107,18 @@ class SnakeGameTest {
         val g = game()
         g.direction = Direction.RIGHT
         g.changeDirection(Direction.LEFT)
-        assertEquals(Direction.RIGHT, g.direction)
+        assertNull(g.pendingDirection)
         g.direction = Direction.UP
         g.changeDirection(Direction.DOWN)
-        assertEquals(Direction.UP, g.direction)
+        assertNull(g.pendingDirection)
     }
 
     @Test
-    fun `changeDirection accepts perpendicular turns`() {
+    fun `changeDirection sets pendingDirection for perpendicular turns`() {
         val g = game()
         g.direction = Direction.RIGHT
         g.changeDirection(Direction.UP)
-        assertEquals(Direction.UP, g.direction)
-        g.changeDirection(Direction.LEFT)
-        assertEquals(Direction.LEFT, g.direction)
+        assertEquals(Direction.UP, g.pendingDirection)
     }
 
     @Test
@@ -128,7 +126,7 @@ class SnakeGameTest {
         val g = game()
         g.pause()
         g.changeDirection(Direction.UP)
-        assertEquals(Direction.RIGHT, g.direction)
+        assertNull(g.pendingDirection)
     }
 
     @Test
@@ -141,7 +139,7 @@ class SnakeGameTest {
         g.step()
         assertEquals(4, g.snake.size)
         assertEquals(Point(6, 5), g.snake.first())
-        assertEquals(scoreBefore + 1, g.score)
+        assertEquals(scoreBefore + 10, g.score)
         assertEquals(GameState.PLAYING, g.state)
     }
 
@@ -159,19 +157,19 @@ class SnakeGameTest {
     }
 
     @Test
-    fun `currentIntervalMs follows the speed-up threshold`() {
+    fun `tickIntervalMs follows the speed-up threshold`() {
         val g = game()
-        assertEquals(150L, g.currentIntervalMs)
-        g.score = 4
-        assertEquals(150L, g.currentIntervalMs)
-        g.score = 5
-        assertEquals(140L, g.currentIntervalMs)
-        g.score = 10
-        assertEquals(130L, g.currentIntervalMs)
-        g.score = 45
-        assertEquals(60L, g.currentIntervalMs)
-        g.score = 999
-        assertEquals(60L, g.currentIntervalMs)
+        assertEquals(150L, g.tickIntervalMs)
+        g.score = 40
+        assertEquals(150L, g.tickIntervalMs)
+        g.score = 50
+        assertEquals(140L, g.tickIntervalMs)
+        g.score = 100
+        assertEquals(130L, g.tickIntervalMs)
+        g.score = 450
+        assertEquals(60L, g.tickIntervalMs)
+        g.score = 9990
+        assertEquals(60L, g.tickIntervalMs)
     }
 
     @Test

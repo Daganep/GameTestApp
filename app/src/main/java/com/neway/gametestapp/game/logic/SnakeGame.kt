@@ -13,7 +13,7 @@ import kotlin.random.Random
  *
  * A [step] advances the head by one cell in [direction]:
  *  - wall or self collision → [GameState.GAME_OVER]
- *  - landing on [food] → grow, spawn a new food, +1 score
+ *  - landing on [food] → grow, spawn a new food, +10 score
  *  - otherwise → drop the tail (length unchanged)
  *
  * [random] is injectable so tests can be deterministic. Not thread-safe:
@@ -26,19 +26,23 @@ class SnakeGame(
 
     var snake: List<Point> = emptyList(); internal set
     var direction: Direction = Direction.RIGHT; internal set
+    var pendingDirection: Direction? = null; internal set
     var food: Point = Point(-1, -1); internal set
     var score: Int = 0; internal set
     var state: GameState = GameState.PLAYING; private set
 
     /**
      * Current tick interval in ms, derived from [score]: every
-     * [GameConfig.speedUpEvery] points the interval drops by
+     * [GameConfig.speedUpEvery] food units the interval drops by
      * [GameConfig.intervalStepMs], never below [GameConfig.minIntervalMs].
      */
-    val currentIntervalMs: Long
-        get() = (config.startIntervalMs -
-            (score / config.speedUpEvery).toLong() * config.intervalStepMs)
-            .coerceAtLeast(config.minIntervalMs)
+    val tickIntervalMs: Long
+        get() {
+            val foodsEaten = score / 10
+            val speedUps = foodsEaten / config.speedUpEvery
+            return (config.startIntervalMs - speedUps.toLong() * config.intervalStepMs)
+                .coerceAtLeast(config.minIntervalMs)
+        }
 
     init {
         reset()
@@ -57,19 +61,21 @@ class SnakeGame(
             Point(cx - 2, cy)
         )
         direction = Direction.RIGHT
+        pendingDirection = null
         score = 0
         state = GameState.PLAYING
         food = FoodSpawner.randomFreeCell(snake, config.size, random) ?: Point(-1, -1)
     }
 
     /**
-     * Request a new [dir]. A 180° reversal (opposite of current [direction]) is ignored.
-     * No-op when not [GameState.PLAYING].
+     * Request a new [dir]. A 180° reversal (opposite of the effective
+     * direction) is rejected. No-op when not [GameState.PLAYING].
      */
     fun changeDirection(dir: Direction) {
         if (state != GameState.PLAYING) return
-        if (dir == direction.opposite()) return
-        direction = dir
+        val effectiveDir = pendingDirection ?: direction
+        if (dir == effectiveDir.opposite()) return
+        pendingDirection = dir
     }
 
     fun pause() {
@@ -85,6 +91,13 @@ class SnakeGame(
      */
     fun step() {
         if (state != GameState.PLAYING) return
+
+        // Apply pending direction at the start of the tick.
+        val pending = pendingDirection
+        if (pending != null) {
+            direction = pending
+            pendingDirection = null
+        }
 
         val head = snake.first()
         val newHead = Point(head.x + direction.dx, head.y + direction.dy)
@@ -104,7 +117,7 @@ class SnakeGame(
 
         if (ate) {
             snake = listOf(newHead) + snake
-            score += 1
+            score += 10
             food = FoodSpawner.randomFreeCell(snake, config.size, random) ?: Point(-1, -1)
         } else {
             snake = listOf(newHead) + snake.dropLast(1)

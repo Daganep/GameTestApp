@@ -46,32 +46,32 @@ empty Activity launches on device/emulator.
 **Goal:** all game logic without Android, 100% unit test coverage.
 
 ### 1.1. Data Models
-- [ ] `Direction` (enum: UP, DOWN, LEFT, RIGHT + `opposite()` method).
-- [ ] `Point(x, y)` — data class for cell coordinates.
-- [ ] `GameConfig` (size=15, startIntervalMs=150, minIntervalMs=60,
+- [x] `Direction` (enum: UP, DOWN, LEFT, RIGHT + `opposite()` method).
+- [x] `Point(x, y)` — data class for cell coordinates.
+- [x] `GameConfig` (size=15, startIntervalMs=150, minIntervalMs=60,
       speedUpEvery=5, intervalStepMs=10).
 
 ### 1.2. Game State Machine (`SnakeGame`)
-- [ ] Fields: `state: State` (PLAYING / PAUSED / GAME_OVER),
+- [x] Fields: `state: State` (PLAYING / PAUSED / GAME_OVER),
       `snake: List<Point>` (tail = head), `food: Point`, `score: Int`,
       `direction`, `pendingDirection`, `tickIntervalMs`.
-- [ ] `fun step()` — one tick: apply direction, check collisions
+- [x] `fun step()` — one tick: apply direction, check collisions
       (wall / body), eat food (+10, growth, new spawn, speed-up every 5).
-- [ ] `fun changeDirection(newDir)` — reject 180° turns and "no-direction" input.
-- [ ] `fun reset()` — initial state (3 segments in center, moving right).
-- [ ] `fun pause() / resume()`.
+- [x] `fun changeDirection(newDir)` — reject 180° turns and "no-direction" input.
+- [x] `fun reset()` — initial state (3 segments in center, moving right).
+- [x] `fun pause() / resume()`.
 
 ### 1.3. Food Generation
-- [ ] `FoodSpawner.randomFreeCell(snake, size, random)` — only free cells;
+- [x] `FoodSpawner.randomFreeCell(snake, size, random)` — only free cells;
       if no cells remain — win (game over with special flag).
 
 ### 1.4. Unit Tests (`app/src/test/.../game/`)
-- [ ] Movement in each direction, no wrap (wall = death).
-- [ ] 180° turn is ignored.
-- [ ] Eating food: growth, +10, new spawn, food not on snake.
-- [ ] Speed-up every 5 food units, not below 60 ms.
-- [ ] Collision with body and wall → GAME_OVER.
-- [ ] `reset` fully resets state.
+- [x] Movement in each direction, no wrap (wall = death).
+- [x] 180° turn is ignored.
+- [x] Eating food: growth, +10, new spawn, food not on snake.
+- [x] Speed-up every 5 food units, not below 60 ms.
+- [x] Collision with body and wall → GAME_OVER.
+- [x] `reset` fully resets state.
 
 **Done when:** `./gradlew :app:testDebugUnitTest` — all tests
 green, logical classes 100% branch coverage.
