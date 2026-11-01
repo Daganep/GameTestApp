@@ -82,22 +82,22 @@ green, logical classes 100% branch coverage.
 **Goal:** high score survives app restarts.
 
 ### 2.1. ScoreStorage Interface
-- [ ] Define interface
+- [x] Define interface
       `ScoreStorage { fun getBest(): Int; fun updateBest(score: Int) }`.
 **Done when:** interface compiled, accessible from other
 packages in the module.
 
 ### 2.2. PrefsScoreStorage Implementation
-- [ ] Implement `PrefsScoreStorage(context)` on `SharedPreferences`
+- [x] Implement `PrefsScoreStorage(context)` on `SharedPreferences`
       (file `snake_prefs`, key `best_score`).
-- [ ] Handle missing key (return 0 by default).
+- [x] Handle missing key (return 0 by default).
 **Done when:** `getBest()` / `updateBest()` work correctly
 on manual smoke check (or via instrumentation test).
 
 ### 2.3. Unit Tests
-- [ ] Test: initial value is 0.
-- [ ] Test: update on higher score.
-- [ ] Test: no change on lower score.
+- [x] Test: initial value is 0.
+- [x] Test: update on higher score.
+- [x] Test: no change on lower score.
 **Done when:** unit tests pass (with `Robolectric` or mocked
 Context).
 
