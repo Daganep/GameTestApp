@@ -118,7 +118,7 @@ Context).
 
 ### 3.3. Main Screen
 - [x] `MainMenuScreen`: title "Snake", high score, "Play" button
-      (Fill, primary), "How to Play" (Tonal), version/copyright.
+      (Fill, primary), "How to Play" (Tonal), version.
 
 ### 3.4. "How to Play" Screen
 - [x] `HowToScreen`: rules (swipe/arrows, food, collisions, speed),
@@ -133,45 +133,45 @@ dark theme works.
 **Goal:** all game logic works without Android and is covered by tests.
 
 ### 4.1. Data Models
-- [ ] `core/model/Point.kt` — data class `Point(val x: Int, val y: Int)`.
-- [ ] `core/model/Direction.kt` — enum `UP/DOWN/LEFT/RIGHT`,
+- [x] `core/model/Point.kt` — data class `Point(val x: Int, val y: Int)`.
+- [x] `core/model/Direction.kt` — enum `UP/DOWN/LEFT/RIGHT`,
       `dx/dy` properties, `opposite()` method.
 **Done when:** classes compiled, available from other packages.
 
 ### 4.2. SnakeGame Class (state and initialization)
-- [ ] `SnakeGame`: grid (e.g. 15×21), `snake: List<Point>`, `direction`,
+- [x] `SnakeGame`: grid (e.g. 15×21), `snake: List<Point>`, `direction`,
       `food: Point`, `score`, `isGameOver`, `speedMs`.
-- [ ] Initial state: 3-segment snake in the center, direction RIGHT,
+- [x] Initial state: 3-segment snake in the center, direction RIGHT,
       food — random free cell.
 **Done when:** `SnakeGame` object created, all fields
 initialized, `isGameOver == false`.
 
 ### 4.3. step() Method
-- [ ] Move head in `direction`.
-- [ ] Tail growth when food is eaten (`score += 10`).
-- [ ] Collision check: wall and own body → `isGameOver = true`.
-- [ ] `randomFood()` generation off the snake (seeded `Random` for
+- [x] Move head in `direction`.
+- [x] Tail growth when food is eaten (`score += 10`).
+- [x] Collision check: wall and own body → `isGameOver = true`.
+- [x] `randomFood()` generation off the snake (seeded `Random` for
       reproducibility).
-- [ ] Speed up: `speedMs −5 ms` per food (min. 90 ms).
+- [x] Speed up: `speedMs −5 ms` per food (min. 90 ms).
 **Done when:** one `step()` call correctly updates
 snake position, score, speed and game state.
 
 ### 4.4. changeDirection() Method
-- [ ] Accept new direction from UI.
-- [ ] Ignore 180° reversal (e.g. UP → DOWN).
-- [ ] Ignore more than one turn per tick (e.g. UP → LEFT →
+- [x] Accept new direction from UI.
+- [x] Ignore 180° reversal (e.g. UP → DOWN).
+- [x] Ignore more than one turn per tick (e.g. UP → LEFT →
       DOWN in one tick — apply only the first one).
 **Done when:** reversals handled per the rules,
 snake cannot turn onto itself in one tick.
 
 ### 4.5. Unit Tests
-- [ ] Growth tests: eating food increases length by 1.
-- [ ] Wall tests: moving out of bounds → `isGameOver == true`.
-- [ ] Tail tests: collision with body → `isGameOver == true`.
-- [ ] Reversal tests: 180° is ignored.
-- [ ] Speed-up tests: `speedMs` decreases by 5 ms, not below 90.
-- [ ] Score tests: `score` increments correctly.
-- [ ] Food spawn tests: food never spawns on the snake
+- [x] Growth tests: eating food increases length by 1.
+- [x] Wall tests: moving out of bounds → `isGameOver == true`.
+- [x] Tail tests: collision with body → `isGameOver == true`.
+- [x] Reversal tests: 180° is ignored.
+- [x] Speed-up tests: `speedMs` decreases by 5 ms, not below 90.
+- [x] Score tests: `score` increments correctly.
+- [x] Food spawn tests: food never spawns on the snake
       (seeded `Random`, ≥ 100 iterations).
 **Done when:** ≥ 15 tests, 100% coverage of key branches,
 `./gradlew :app:testDebugUnitTest` green.

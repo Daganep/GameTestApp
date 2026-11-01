@@ -1,13 +1,16 @@
 package com.neway.gametestapp.game.model
 
 /**
- * Game tuning configuration.
- * Defaults follow the values defined in Stage 1 (1.1).
+ * Tunable parameters for a [SnakeGame] instance.
+ *
+ * @param size grid dimension in cells (square grid: size × size).
+ * @param startSpeedMs initial tick interval in milliseconds (150 ms).
+ * @param minSpeedMs lowest allowed tick interval (90 ms).
+ * @param speedDecrementMs how much faster each tick gets per food eaten (5 ms).
  */
 data class GameConfig(
     val size: Int = 15,
-    val startIntervalMs: Long = 150L,
-    val minIntervalMs: Long = 60L,
-    val speedUpEvery: Int = 5,
-    val intervalStepMs: Long = 10L
+    val startSpeedMs: Long = 150L,
+    val minSpeedMs: Long = 90L,
+    val speedDecrementMs: Long = 5L
 )

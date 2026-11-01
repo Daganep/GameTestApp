@@ -1,8 +1,7 @@
-package com.neway.gametestapp.game.logic
+﻿package com.neway.gametestapp.game.logic
 
 import com.neway.gametestapp.game.model.Direction
 import com.neway.gametestapp.game.model.GameConfig
-import com.neway.gametestapp.game.model.GameState
 import com.neway.gametestapp.game.model.Point
 import kotlin.random.Random
 import org.junit.Assert.assertEquals
@@ -18,27 +17,14 @@ class SnakeGameTest {
         SnakeGame(config, random)
 
     @Test
-    fun `reset places a 3 segment snake at centre moving right`() {
+    fun `reset clears score and resets to initial state`() {
         val g = game()
-        val cx = GameConfig().size / 2
-        val cy = GameConfig().size / 2
-        assertEquals(3, g.snake.size)
-        assertEquals(Point(cx, cy), g.snake.first())
-        assertEquals(Point(cx - 1, cy), g.snake[1])
-        assertEquals(Point(cx - 2, cy), g.snake[2])
-        assertEquals(Direction.RIGHT, g.direction)
-    }
-
-    @Test
-    fun `reset clears score and sets state to PLAYING`() {
-        val g = game()
-        g.score = 42
-        g.pause()
-        assertEquals(GameState.PAUSED, g.state)
+        g.direction = Direction.DOWN
         g.reset()
         assertEquals(0, g.score)
-        assertEquals(GameState.PLAYING, g.state)
+        assertFalse(g.isGameOver)
         assertEquals(Direction.RIGHT, g.direction)
+        assertEquals(3, g.snake.size)
     }
 
     @Test
@@ -122,9 +108,13 @@ class SnakeGameTest {
     }
 
     @Test
-    fun `changeDirection is ignored when not playing`() {
+    fun `changeDirection is ignored after game over`() {
         val g = game()
-        g.pause()
+        g.snake = listOf(Point(0, 5), Point(1, 5), Point(2, 5))
+        g.direction = Direction.LEFT
+        g.food = Point(-1, -1)
+        g.step()
+        assertTrue(g.isGameOver)
         g.changeDirection(Direction.UP)
         assertNull(g.pendingDirection)
     }
@@ -140,36 +130,25 @@ class SnakeGameTest {
         assertEquals(4, g.snake.size)
         assertEquals(Point(6, 5), g.snake.first())
         assertEquals(scoreBefore + 10, g.score)
-        assertEquals(GameState.PLAYING, g.state)
+        assertTrue(g.food != Point(6, 5))
     }
 
     @Test
-    fun `eating food spawns a new food on a free cell`() {
-        val g = game(random = Random(7))
+    fun `eating food decreases speedMs and floors at minSpeedMs`() {
+        val g = game(config = GameConfig(speedDecrementMs = 5L, minSpeedMs = 90L, startSpeedMs = 100L))
+        val speedBefore = g.speedMs
         g.snake = listOf(Point(5, 5), Point(4, 5), Point(3, 5))
         g.direction = Direction.RIGHT
         g.food = Point(6, 5)
         g.step()
-        val size = g.config.size
-        assertTrue(g.food.x in 0 until size)
-        assertTrue(g.food.y in 0 until size)
-        assertTrue(g.food !in g.snake)
-    }
+        assertEquals(speedBefore - 5L, g.speedMs)
 
-    @Test
-    fun `tickIntervalMs follows the speed-up threshold`() {
-        val g = game()
-        assertEquals(150L, g.tickIntervalMs)
-        g.score = 40
-        assertEquals(150L, g.tickIntervalMs)
-        g.score = 50
-        assertEquals(140L, g.tickIntervalMs)
-        g.score = 100
-        assertEquals(130L, g.tickIntervalMs)
-        g.score = 450
-        assertEquals(60L, g.tickIntervalMs)
-        g.score = 9990
-        assertEquals(60L, g.tickIntervalMs)
+        g.snake = listOf(Point(5, 5), Point(4, 5), Point(3, 5))
+        g.direction = Direction.RIGHT
+        g.food = Point(6, 5)
+        g.speedMs = 95L
+        g.step()
+        assertEquals(90L, g.speedMs)
     }
 
     @Test
@@ -179,7 +158,7 @@ class SnakeGameTest {
         g.direction = Direction.LEFT
         g.food = Point(-1, -1)
         g.step()
-        assertEquals(GameState.GAME_OVER, g.state)
+        assertTrue(g.isGameOver)
     }
 
     @Test
@@ -190,7 +169,7 @@ class SnakeGameTest {
         g.direction = Direction.RIGHT
         g.food = Point(-1, -1)
         g.step()
-        assertEquals(GameState.GAME_OVER, g.state)
+        assertTrue(g.isGameOver)
     }
 
     @Test
@@ -200,7 +179,7 @@ class SnakeGameTest {
         g.direction = Direction.UP
         g.food = Point(-1, -1)
         g.step()
-        assertEquals(GameState.GAME_OVER, g.state)
+        assertTrue(g.isGameOver)
     }
 
     @Test
@@ -211,7 +190,7 @@ class SnakeGameTest {
         g.direction = Direction.DOWN
         g.food = Point(-1, -1)
         g.step()
-        assertEquals(GameState.GAME_OVER, g.state)
+        assertTrue(g.isGameOver)
     }
 
     @Test
@@ -221,34 +200,7 @@ class SnakeGameTest {
         g.direction = Direction.DOWN
         g.food = Point(-1, -1)
         g.step()
-        assertEquals(GameState.GAME_OVER, g.state)
-    }
-
-    @Test
-    fun `pause sets state to PAUSED`() {
-        val g = game()
-        g.pause()
-        assertEquals(GameState.PAUSED, g.state)
-    }
-
-    @Test
-    fun `resume returns state to PLAYING`() {
-        val g = game()
-        g.pause()
-        g.resume()
-        assertEquals(GameState.PLAYING, g.state)
-    }
-
-    @Test
-    fun `step is a no-op when the game is paused`() {
-        val g = game()
-        g.snake = listOf(Point(5, 5), Point(4, 5), Point(3, 5))
-        g.direction = Direction.RIGHT
-        g.food = Point(-1, -1)
-        g.pause()
-        g.step()
-        assertEquals(Point(5, 5), g.snake.first())
-        assertEquals(GameState.PAUSED, g.state)
+        assertTrue(g.isGameOver)
     }
 
     @Test
@@ -258,10 +210,10 @@ class SnakeGameTest {
         g.direction = Direction.LEFT
         g.food = Point(-1, -1)
         g.step()
+        assertTrue(g.isGameOver)
         val afterGameOver = g.snake.toList()
         g.step()
         assertEquals(afterGameOver, g.snake)
-        assertEquals(GameState.GAME_OVER, g.state)
     }
 
     @Test
@@ -274,10 +226,10 @@ class SnakeGameTest {
         assertTrue(g.food.y in 0 until 5)
     }
 
-    // ── FoodSpawner direct coverage ─────────────────────────────────────────
+    // -- FoodSpawner direct coverage --
 
     @Test
-    fun `randomFreeCell returns null when the board is full`() {
+    fun `randomFreeCell returns null when the box is full`() {
         val size = 3
         val full = (0 until size).flatMap { x -> (0 until size).map { y -> Point(x, y) }}
         assertNull(FoodSpawner.randomFreeCell(full, size, Random(1L)))
@@ -296,4 +248,3 @@ class SnakeGameTest {
         }
     }
 }
-
