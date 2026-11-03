@@ -46,19 +46,25 @@ private fun AppRoot() {
     var screen by remember { mutableStateOf<Screen>(Screen.Menu) }
     val scoreStorage = remember { PrefsScoreStorage(context) }
 
-    when (screen) {
+    val currentScreen = screen
+    when (currentScreen) {
         Screen.Menu -> MainMenuScreen(
             bestScore = scoreStorage.getBest(),
             onPlay = { screen = Screen.Game },
             onHowTo = { screen = Screen.HowTo }
         )
 
-        Screen.Game -> GameScreen()
+        Screen.Game -> GameScreen(onExit = { screen = Screen.Menu })
 
         Screen.HowTo -> HowToScreen(
             onBack = { screen = Screen.Menu }
         )
 
-        is Screen.GameOver -> GameOverScreen()
+        is Screen.GameOver -> GameOverScreen(
+            score = currentScreen.score,
+            isNewRecord = currentScreen.isNewRecord,
+            onRestart = { screen = Screen.Game },
+            onExit = { screen = Screen.Menu }
+        )
     }
 }

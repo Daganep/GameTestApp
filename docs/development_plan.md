@@ -182,25 +182,25 @@ snake cannot turn onto itself in one tick.
 **Goal:** playable "like a snake".
 
 ### 5.1. GameViewModel
-- [ ] `GameViewModel : AndroidViewModel` + `SnakeGame` from the `core` module;
+- [x] `GameViewModel : AndroidViewModel` + `SnakeGame` from the `core` module;
       `MutableStateFlow<GameUiState>`.
 
 ### 5.2. Game loop (Ticker)
-- [ ] `Handler(Looper.getMainLooper())` + `postDelayed` with a dynamic
+- [x] `Handler(Looper.getMainLooper())` + `postDelayed` with a dynamic
       interval from `speedMs`; start/pause/stop;
       `onCleared()` — guaranteed removal of the delayed message.
 
 ### 5.3. Rendering and input (`GameScreen`)
-- [ ] Canvas/Compose rendering: snake (rounded-rect segments, head),
+- [x] Canvas/Compose rendering: snake (rounded-rect segments, head),
       food (circle/"apple"), background grid; `BoxWithConstraints` for sizing.
-- [ ] Gestures: `detectVerticalSwipeGestures` + `detectHorizontalSwipeGestures`
+- [x] Gestures: `detectVerticalSwipeGestures` + `detectHorizontalSwipeGestures`
       → `changeDirection`.
 - [ ] `onKeyDown` emulation for keyboard input (optional).
-- [ ] "Pause" button, score and high score at the top.
+- [x] "Pause" button, score and high score at the top.
 
 ### 5.4. Transition to "Game Over"
-- [ ] Transition to `Screen.GameOver(score, isNewRecord)` on `isGameOver`.
-- [ ] High score persistence via `ScoreStorage`.
+- [x] Transition to `Screen.GameOver(score, isNewRecord)` on `isGameOver`.
+- [x] High score persistence via `ScoreStorage`.
 
 **Done when:** a full game session on device/emulator;
 pause works; high score is updated; no leaks (LeakCanary check is optional —
