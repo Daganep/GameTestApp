@@ -33,7 +33,8 @@ class GameViewModelTest {
         storage = mock(ScoreStorage::class.java)
         timer = mock(GameTimer::class.java)
         application = mock(Application::class.java)
-        `when`(game.size).thenReturn(10)
+        `when`(game.size).thenReturn(12)
+        `when`(game.rows).thenReturn(16)
         `when`(game.snake).thenReturn(emptyList())
         `when`(game.food).thenReturn(Point(5, 5))
         `when`(game.score).thenReturn(0)
@@ -42,7 +43,7 @@ class GameViewModelTest {
     }
 
     private fun viewModel(): GameViewModel =
-        GameViewModel(application, storage, game) { _ -> timer }
+        GameViewModel(application, storage, game, createTimer = { _ -> timer })
 
     @Test
     fun `ui state exposes the best score from storage`() {
@@ -81,6 +82,15 @@ class GameViewModelTest {
         verify(game, never()).step()
         verify(timer).stop()
         verify(storage, never()).updateBest(0)
+    }
+
+    @Test
+    fun `game over triggers haptic feedback`() {
+        var vibrations = 0
+        val vm = GameViewModel(application, storage, game, { _ -> timer }) { vibrations++ }
+        `when`(game.isGameOver).thenReturn(false, true)
+        vm.step()
+        assertEquals(1, vibrations)
     }
 
     @Test

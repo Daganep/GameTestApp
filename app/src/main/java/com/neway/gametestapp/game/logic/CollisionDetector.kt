@@ -8,10 +8,10 @@ import com.neway.gametestapp.game.model.Point
 object CollisionDetector {
 
     /**
-     * `true` when [point] is outside the [size] × [size] grid.
+     * `true` when [point] is outside the [cols] × [rows] grid.
      */
-    fun hitWall(point: Point, size: Int): Boolean =
-        point.x < 0 || point.y < 0 || point.x >= size || point.y >= size
+    fun hitWall(point: Point, cols: Int, rows: Int): Boolean =
+        point.x < 0 || point.y < 0 || point.x >= cols || point.y >= rows
 
     /**
      * `true` when [head] overlaps any cell in [body].

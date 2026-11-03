@@ -1,3 +1,31 @@
 <resources>
     <string name="app_name">GameTestApp</string>
+
+    <!-- Main menu -->
+    <string name="game_title">Snake</string>
+    <string name="best_score">Best score: %1$d</string>
+    <string name="menu_play">Play</string>
+    <string name="menu_how_to">How to Play</string>
+    <string name="version_copyright">Version %1$s • © 2026</string>
+
+    <!-- Game HUD -->
+    <string name="score_label">Score: %1$d</string>
+    <string name="speed_label">Speed: %1$dms</string>
+    <string name="a11y_exit">Exit</string>
+    <string name="close_button" translatable="false">✕</string>
+    <string name="a11y_score">Score</string>
+    <string name="a11y_speed">Speed</string>
+
+    <!-- Game over -->
+    <string name="game_over">Game Over</string>
+    <string name="new_record">🏆 New Record!</string>
+    <string name="menu_play_again">Play Again</string>
+    <string name="menu_back">Menu</string>
+
+    <!-- How to play -->
+    <string name="rule_steer">Steer the snake with swipe gestures.</string>
+    <string name="rule_food">Eat the food to grow — every food gives +10 points.</string>
+    <string name="rule_collision">Hit a wall or your own body and the game is over.</string>
+    <string name="rule_speed">The snake gets a little faster with every food.</string>
+    <string name="back">Back</string>
 </resources>

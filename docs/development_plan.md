@@ -27,7 +27,7 @@ working, runnable application state (except Stage 0) and passing tests.
   ├── ui
   │   ├── theme/          (Theme.kt, Color.kt, Type.kt)
   │   ├── menu/           (MainMenuScreen.kt)
-  │   ├── game/           (GameScreen.kt, GameBoard.kt, DPad.kt)
+  │   ├── game/           (GameScreen.kt, GameBoard.kt)
   │   ├── howto/          (HowToScreen.kt)
   │   └── gameover/       (GameOverScreen.kt)
   ├── game
@@ -212,15 +212,15 @@ via a memory log over 10 sessions).
 **Goal:** final screen, polish, and an installable build.
 
 ### 6.1. "Game Over" screen
-- [ ] `GameOverScreen`: score, "New Record!" (conditional), "Play Again" /
+- [x] `GameOverScreen`: score, "New Record!" (conditional), "Play Again" /
       "Menu" buttons; appear animation.
 
 ### 6.2. UI and resources polish
-- [ ] Sound effects (optional).
-- [ ] Haptic feedback on death.
-- [ ] Splash screen (Compose `SplashScreen`).
-- [ ] App icon (adaptive icon).
-- [ ] `strings.xml` — all text moved to resources.
+- [ ] Sound effects (optional) — skipped (not implemented; optional item).
+- [x] Haptic feedback on death.
+- [x] Splash screen (Compose `SplashScreen`).
+- [x] App icon (adaptive icon).
+- [x] `strings.xml` — all text moved to resources.
 
 ### 6.3. Quality, build and release
 - [ ] `lint` without errors, `testDebugUnitTest` green.

@@ -11,12 +11,13 @@ object FoodSpawner {
 
     fun randomFreeCell(
         snake: Collection<Point>,
-        size: Int,
+        cols: Int,
+        rows: Int,
         random: Random = Random.Default
     ): Point? {
         val occupied = snake.toSet()
-        val free = (0 until size)
-            .flatMap { x -> (0 until size).map { y -> Point(x, y) } }
+        val free = (0 until cols)
+            .flatMap { x -> (0 until rows).map { y -> Point(x, y) } }
             .filter { it !in occupied }
         return free.randomOrNull(random)
     }

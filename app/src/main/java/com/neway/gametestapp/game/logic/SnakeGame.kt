@@ -1,4 +1,4 @@
-﻿package com.neway.gametestapp.game.logic
+package com.neway.gametestapp.game.logic
 
 import com.neway.gametestapp.game.model.Direction
 import com.neway.gametestapp.game.model.GameConfig
@@ -11,15 +11,18 @@ import kotlin.random.Random
  * Drives the snake one cell per [step]. Each food eaten grows the snake,
  * adds points, and makes the game slightly faster (per-food speed decrement).
  *
- * @param config game tunables (grid size, speed, …).
+ * @param config game tunables (grid size, speed, ...).
  * @param random injectable [Random] for reproducible tests.
  */
 class SnakeGame(
     val config: GameConfig = GameConfig(),
     private val random: Random = Random.Default
 ) {
-    /** Grid dimension in cells. */
+    /** Grid width in cells (columns). */
     val size: Int get() = config.size
+
+    /** Grid height in cells (rows). */
+    val rows: Int get() = config.rows
 
     /** Snake body; head is the first element. */
     var snake: List<Point> = emptyList(); internal set
@@ -59,7 +62,7 @@ class SnakeGame(
         val head = snake.first()
         val newHead = Point(head.x + direction.dx, head.y + direction.dy)
 
-        if (CollisionDetector.hitWall(newHead, config.size) ||
+        if (CollisionDetector.hitWall(newHead, config.size, config.rows) ||
             (CollisionDetector.hitSelf(newHead, snake) && snake.last() != newHead)
         ) {
             isGameOver = true
@@ -70,7 +73,7 @@ class SnakeGame(
             snake = listOf(newHead) + snake
             score += 10
             speedMs = (speedMs - config.speedDecrementMs).coerceAtLeast(config.minSpeedMs)
-            val newFood = FoodSpawner.randomFreeCell(snake, config.size, random)
+            val newFood = FoodSpawner.randomFreeCell(snake, config.size, config.rows, random)
             if (newFood == null) {
                 isGameOver = true
                 return
@@ -90,18 +93,19 @@ class SnakeGame(
 
     /** Reset all game state to the initial values. */
     fun reset() {
-        val center = size / 2
+        val centerCol = size / 2
+        val centerRow = rows / 2
         snake = listOf(
-            Point(center, center),
-            Point(center - 1, center),
-            Point(center - 2, center)
+            Point(centerCol, centerRow),
+            Point(centerCol - 1, centerRow),
+            Point(centerCol - 2, centerRow)
         )
         direction = Direction.RIGHT
         score = 0
         speedMs = config.startSpeedMs
         pendingDirection = null
         isGameOver = false
-        food = FoodSpawner.randomFreeCell(snake, config.size, random)
+        food = FoodSpawner.randomFreeCell(snake, config.size, config.rows, random)
             ?: Point(0, 0)
     }
 }

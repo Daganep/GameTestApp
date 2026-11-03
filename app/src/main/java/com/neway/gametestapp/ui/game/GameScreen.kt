@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,17 +24,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import com.neway.gametestapp.R
 import com.neway.gametestapp.ui.gameover.GameOverScreen
 import com.neway.gametestapp.util.swipeDetector
 
 /**
- * Main game screen: score bar, game board (swipe-enabled), and D-pad.
+ * Main game screen: score bar and a full-height game board (swipe-enabled).
  * Shows [GameOverScreen] as a full-screen overlay when the game ends.
  *
  * @param onExit  called when the user dismisses the game (top-bar ✕ or Game-Over screen).
@@ -64,10 +66,10 @@ fun GameScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Snake") },
+                title = { Text(stringResource(R.string.app_name)) },
                 actions = {
                     IconButton(onClick = onExit) {
-                        Text("✕", fontSize = 22.sp)
+                        Text(stringResource(R.string.close_button), fontSize = 22.sp)
                     }
                 }
             )
@@ -88,37 +90,31 @@ fun GameScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Score: ${state.score}",
+                        text = stringResource(R.string.score_label, state.score),
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Speed: ${state.speedMs}ms",
+                        text = stringResource(R.string.speed_label, state.speedMs),
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
-                Spacer(Modifier.weight(1f))
-
                 // ── Game board (swipe to steer) ─────────────────────────────
+                // Sized by the grid's aspect ratio, so all cells stay square
+                // (the board grows by adding rows, not by stretching cells).
                 GameBoard(
                     snake = state.snake,
                     food = state.food,
-                    gridSize = state.size,
+                    gridWidth = state.size,
+                    gridHeight = state.rows,
                     modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .aspectRatio(state.size.toFloat() / state.rows)
                         .swipeDetector(onDirection = { dir -> viewModel.changeDirection(dir) })
-                )
-
-                Spacer(Modifier.weight(1f))
-
-                // ── D-pad ──────────────────────────────────────────────────
-                DPad(
-                    onDirection = { dir -> viewModel.changeDirection(dir) },
-                    modifier = Modifier.padding(bottom = 16.dp)
                 )
             }
 

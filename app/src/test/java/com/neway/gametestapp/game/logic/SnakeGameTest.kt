@@ -32,7 +32,7 @@ class SnakeGameTest {
         val g = game()
         val size = g.config.size
         assertTrue(g.food.x in 0 until size)
-        assertTrue(g.food.y in 0 until size)
+        assertTrue(g.food.y in 0 until g.config.rows)
         assertTrue(g.food !in g.snake)
     }
 
@@ -186,7 +186,7 @@ class SnakeGameTest {
     fun `hitting the bottom wall ends the game`() {
         val g = game()
         val size = g.config.size
-        g.snake = listOf(Point(5, size - 1), Point(5, size - 2), Point(5, size - 3))
+        g.snake = listOf(Point(5, g.config.rows - 1), Point(5, g.config.rows - 2), Point(5, g.config.rows - 3))
         g.direction = Direction.DOWN
         g.food = Point(-1, -1)
         g.step()
@@ -218,7 +218,7 @@ class SnakeGameTest {
 
     @Test
     fun `game works on a small grid`() {
-        val g = game(config = GameConfig(size = 5))
+        val g = game(config = GameConfig(size = 5, rows = 5))
         assertEquals(5, g.config.size)
         assertEquals(2, g.snake.first().x)
         assertEquals(2, g.snake.first().y)
@@ -232,7 +232,7 @@ class SnakeGameTest {
     fun `randomFreeCell returns null when the box is full`() {
         val size = 3
         val full = (0 until size).flatMap { x -> (0 until size).map { y -> Point(x, y) }}
-        assertNull(FoodSpawner.randomFreeCell(full, size, Random(1L)))
+        assertNull(FoodSpawner.randomFreeCell(full, size, size, Random(1L)))
     }
 
     @Test
@@ -240,7 +240,7 @@ class SnakeGameTest {
         val size = 8
         val snake = listOf(Point(0, 0), Point(1, 0), Point(2, 0))
         repeat(500) { i ->
-            val cell = FoodSpawner.randomFreeCell(snake, size, Random(i.toLong()))
+            val cell = FoodSpawner.randomFreeCell(snake, size, size, Random(i.toLong()))
             assertNotNull("food was null for seed $i", cell)
             assertTrue("x out of bounds: $cell", cell!!.x in 0 until size)
             assertTrue("y out of bounds: $cell", cell.y in 0 until size)

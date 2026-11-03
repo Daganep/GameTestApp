@@ -11,7 +11,8 @@ import com.neway.gametestapp.game.model.Point
  * @param score current score.
  * @param isGameOver true when the game is over.
  * @param speedMs current tick interval in milliseconds.
- * @param size grid dimension in cells.
+ * @param size grid width in cells (columns).
+ * @param rows grid height in cells (rows).
  * @param bestScore best score persisted via [com.neway.gametestapp.game.storage.ScoreStorage].
  */
 data class GameUiState(
@@ -21,6 +22,7 @@ data class GameUiState(
     val isGameOver: Boolean = false,
     val speedMs: Long = 0L,
     val size: Int = 0,
+    val rows: Int = 0,
     val bestScore: Int = 0
 ) {
     companion object {
@@ -32,6 +34,7 @@ data class GameUiState(
             isGameOver = game.isGameOver,
             speedMs = game.speedMs,
             size = game.size,
+            rows = game.rows,
             bestScore = bestScore
         )
     }

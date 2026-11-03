@@ -1,90 +1,98 @@
 package com.neway.gametestapp.ui.menu
 
-import android.content.pm.PackageManager
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.neway.gametestapp.BuildConfig
+import com.neway.gametestapp.R
+import com.neway.gametestapp.ui.theme.GameBackground
+import com.neway.gametestapp.ui.theme.GameSurface
+import com.neway.gametestapp.ui.theme.SnakeGreen
+import com.neway.gametestapp.ui.theme.TextPrimary
 
-/**
- * Main menu screen (Stage 3.3).
- *
- * Shows the game title "Snake", the best score, the primary "Play" button
- * (filled), the "How to Play" button (tonal) and the app version with copyright.
- */
 @Composable
 fun MainMenuScreen(
-    bestScore: Int,
     onPlay: () -> Unit,
-    onHowTo: () -> Unit
+    onHowTo: () -> Unit,
+    bestScore: Int
 ) {
-    val context = LocalContext.current
-    val version = remember {
-        try {
-            context.packageManager.getPackageInfo(context.packageName, 0).versionName
-        } catch (e: PackageManager.NameNotFoundException) {
-            ""
-        }
-    }
-
-    Column(
+    val version = BuildConfig.VERSION_NAME
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color(0xFF0F1A0F), GameBackground)
+                )
+            )
     ) {
-        Text(
-            text = "Snake",
-            style = MaterialTheme.typography.displaySmall,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "Best score: $bestScore",
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        Spacer(modifier = Modifier.height(48.dp))
-
-        Button(
-            onClick = onPlay,
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Play")
+            Text(
+                text = stringResource(R.string.game_title),
+                style = androidx.compose.material3.MaterialTheme.typography.displayLarge,
+                color = SnakeGreen,
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = stringResource(R.string.best_score, bestScore),
+                style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+                color = TextPrimary.copy(alpha = 0.7f),
+            )
+            Spacer(modifier = Modifier.height(48.dp))
+
+            Button(
+                onClick = onPlay,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 64.dp)
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = SnakeGreen),
+            ) {
+                Text(stringResource(R.string.menu_play), fontSize = 20.sp, color = Color.White)
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Button(
+                onClick = onHowTo,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 64.dp)
+                    .height(48.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = GameSurface),
+            ) {
+                Text(stringResource(R.string.menu_how_to), fontSize = 18.sp, color = TextPrimary)
+            }
+
+            Spacer(modifier = Modifier.height(72.dp))
+            Text(
+                text = stringResource(R.string.version_copyright, version),
+                style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+                color = TextPrimary.copy(alpha = 0.4f),
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        FilledTonalButton(
-            onClick = onHowTo,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "How to Play")
-        }
-
-        Spacer(modifier = Modifier.height(64.dp))
-
-        Text(
-            text = "Version $version • © 2026",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
